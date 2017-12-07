@@ -1,5 +1,6 @@
 import os
 import pickle
+import collections
 import numpy as np
 import pandas as pd
 
@@ -11,7 +12,7 @@ creative_type_metrics = {
     'video': ('DFP CTR','3P CTR', 'VSR'),
     'interactive non video': ('DFP CTR', '3P CTR','IR'),
     'interactive video': ('DFP CTR', '3P CTR','IR', 'VSR'),
-    }
+}
 
 metric_dict = {
     'DFP': {
@@ -186,7 +187,7 @@ def no_match_sorting(df, d1, d2, imp_thresh=1000):
 
     no_match = collections.namedtuple(
         'no_match', (
-            'Advertiser', 'Order', 'site', 'Line item', 'status', 'impressions'
+            'Advertiser', 'Order', 'site', 'Line_item', 'status', 'impressions'
         )
     )
 
