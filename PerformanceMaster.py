@@ -183,6 +183,8 @@ def mismatched_checker():
     
     """    
     
+    pass
+    
 def ctr_checker():
     """
     Finds all campaigns without any CTR
