@@ -178,7 +178,8 @@ def mismatched_checker(df, d1,d2):
     """
     Finds all campaigns where creative.type is pulling in an incorrect type. 
     Returns creative versions where the main KPI for that creative.type is receiving no actions.
-        ex: VSR = NaN or IR = NaN
+        ex: VSR = NaN, IR = NaN, CTR = 0.0000
+        
     
     Inputs:
     df = DataFrame of all creatives and interactions
@@ -293,12 +294,6 @@ def mismatched_checker(df, d1,d2):
     df_all=df_all[col_order]
     df_all=df_all[df_all['DFP Creative ID Impressions']>50]
     return df_all
-    
-def ctr_checker():
-    """
-    Finds all campaigns without any CTR
-    
-    """
     
     
 def benchmark_compare():
