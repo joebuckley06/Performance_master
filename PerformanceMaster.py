@@ -4,6 +4,7 @@ import collections
 import numpy as np
 import pandas as pd
 
+#################### variables for function use ################################
 sites = ('qz', 'wrk', 'zty')
 
 creative_type_metrics = {
@@ -12,6 +13,17 @@ creative_type_metrics = {
     'video': ('DFP CTR','3P CTR', 'VSR'),
     'interactive non video': ('DFP CTR', '3P CTR','IR'),
     'interactive video': ('DFP CTR', '3P CTR','IR', 'VSR'),
+}
+
+creative_types = {
+    'branded driver',
+    'co-branded driver',
+    'interactive non video',
+    'interactive video',
+    'no match',
+    'traffic driver',
+    'video',
+    'video autoplay'
 }
 
 metric_dict = {
@@ -49,6 +61,7 @@ metric_dict = {
     }
 }
 
+############################# functions below ##################################
 def metric_calcs(df, metric='DFP CTR'):
     if metric == 'DFP CTR':
         x = (df['DFP Creative ID Clicks'] / df['DFP Creative ID Impressions']) * 100
@@ -218,8 +231,6 @@ def no_match_sorting(df, d1, d2, imp_thresh=1000):
     no_match = pd.DataFrame(s1)
     return no_match
 
-
-
 def mismatched_checker():
     """
     Finds all campaigns where creative.type is pulling in an incorrect type
@@ -235,14 +246,12 @@ def ctr_checker():
 
     """
 
-
 def benchmark_compare():
     """
     Flags all placements that are underperforming relative to their main KPIs
 
 
     """
-
 
 def viewability_checker():
     """
