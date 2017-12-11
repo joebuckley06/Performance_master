@@ -238,9 +238,6 @@ def mismatched_checker():
 
     ex: VSR = NaN or IR = NaN
 
-
-    """
-
 def ctr_checker():
     """
     Finds all campaigns without any CTR
