@@ -213,7 +213,7 @@ def mismatched_checker(df, d1,d2):
             ['DFP Creative ID Clicks', 'int sessions','result_5', 'DFP Creative ID Impressions']
     }
     for creative_type in set(df['creative.type']):
-        if creative_type == 'interactive non video' or creative_type == 'brand survey:
+        if creative_type == 'interactive non video' or creative_type == 'brand survey':
             x = tuple(metric_dict[creative_type])
             dfx = df[(df['Date'] >= d1) & (df['Date'] <= d2)].copy()
             dfx = dfx[(dfx['creative.type'] == creative_type)]
