@@ -214,7 +214,7 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
         'interactive video':
             ['DFP Creative ID Clicks', 'int sessions','result_5','DFP Creative ID Impressions'],
         'no match':
-            ['DFP Creative ID Clicks', 'int sessions','result_5', 'DFP Creative ID Impressions']
+            ['DFP Creative ID Clicks', 'DFP Creative ID Impressions']
     }
 
 
@@ -254,7 +254,7 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
 
             dfx['mis_match'] = 'no_clicks'
             dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
-            del dfx['int sessions']
+            del dfx['DFP Creative ID Clicks']
             storage.append(dfx)
 
 
