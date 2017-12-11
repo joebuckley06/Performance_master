@@ -242,20 +242,19 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
 
         elif 'no match' in creative_type:
 
-            x = tuple(metric_dict['no match'])
-            dfx = df[(df['Date'] >= d1) & (df['Date'] <= d2)].copy()
-            dfx = dfx[(dfx['creative.type'] == 'no match')]
-            groupons = ['Advertiser', 'placement','site','creative.type']
-            dfx = dfx.groupby(groupons, as_index=False)[x].sum()
-            dfx['mis_match'] = dfx['DFP Creative ID Clicks'] / dfx['DFP Creative ID Impressions']
-            dfx = dfx[dfx['mis_match']==0]
-            if len(dfx)<1:
+            metrics = metric_dict[creative_type]
+
+            dfx = df[(df['creative.type'] == creative_type)]
+            dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
+            dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
+            dfx = dfx[dfx['DFP Creative ID Clicks']==0].copy()
+
+            if dfx.empty:
                 print('no '+creative_type+' mismatches')
-            dfx['mis_match'] = dfx['mis_match'].replace(0,'no_clicks')
+
+            dfx['mis_match'] = 'no_clicks'
             dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
-            x=list(x)
-            x.pop(-1)
-            dfx = dfx.drop(x, axis=1)
+            del dfx['int sessions']
             storage.append(dfx)
 
 
