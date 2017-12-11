@@ -174,22 +174,15 @@ def no_match_sorting(df, d1, d2, imp_thresh=1000):
 
 
     
-def mismatched_checker(df, d1,d2):
+def mismatched_checker():
     """
-    Finds all campaigns where creative.type is pulling in an incorrect type. 
-    Returns creative versions where the main KPI for that creative.type is receiving no actions.
-        ex: VSR = NaN, IR = NaN, CTR = 0.0000
-        
+    Finds all campaigns where creative.type is pulling in an incorrect type
     
-    Inputs:
-    df = DataFrame of all creatives and interactions
-    d1 = start date
-    d2 = end date
+    ex: VSR = NaN or IR = NaN
     
-    Outputs:
-    DataFrame with all "mis-matches" with impressions greater than 50 (to remove testing/one-off creatives)
     
     """    
+<<<<<<< HEAD
     storage=[]
     groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
     metric_dict= {
@@ -296,6 +289,14 @@ def mismatched_checker(df, d1,d2):
     df_all=df_all[col_order]
     df_all=df_all[df_all['DFP Creative ID Impressions']>50]
     return df_all
+=======
+    
+def ctr_checker():
+    """
+    Finds all campaigns without any CTR
+    
+    """
+>>>>>>> parent of 7f43141... Merge pull request #2 from joebuckley06/mis_matched
     
     
 def benchmark_compare():
