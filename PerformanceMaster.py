@@ -182,121 +182,12 @@ def mismatched_checker():
     
     
     """    
-<<<<<<< HEAD
-    storage=[]
-    groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
-    metric_dict= {
-        'branded driver': 
-            ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
-        'traffic driver': 
-            ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
-        'video autoplay':
-            ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
-        'co-branded driver':
-            ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
-        'video': 
-            ['DFP Creative ID Clicks', 'result_5', 'DFP Creative ID Impressions'],
-        'interactive non video': 
-            ['DFP Creative ID Clicks', 'int sessions','DFP Creative ID Impressions'],
-        'brand survey': 
-            ['DFP Creative ID Clicks', 'int sessions','DFP Creative ID Impressions'],
-        'interactive video': 
-            ['DFP Creative ID Clicks', 'int sessions','result_5','DFP Creative ID Impressions'],
-        'no match': 
-            ['DFP Creative ID Clicks', 'int sessions','result_5', 'DFP Creative ID Impressions']
-    }
-    for creative_type in set(df['creative.type']):
-        if creative_type == 'interactive non video' or creative_type == 'brand survey':
-            x = tuple(metric_dict[creative_type])
-            dfx = df[(df['Date'] >= d1) & (df['Date'] <= d2)].copy()
-            dfx = dfx[(dfx['creative.type'] == creative_type)]
-            dfx = dfx.groupby(groupons, as_index=False)[x].sum()
-            dfx['mis_match'] = dfx['int sessions'] / dfx['DFP Creative ID Impressions']
-            dfx = dfx[dfx['mis_match'].isnull()]
-            if len(dfx)<1:
-                print('no '+creative_type+' mismatches')
-            dfx['mis_match'] = dfx['mis_match'].fillna('no_kpi_actions')
-            dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
-            x=list(x)
-            x.pop(-1)
-            dfx = dfx.drop(x, axis=1)
-            storage.append(dfx)
-        elif 'no match' in creative_type:
-            x = tuple(metric_dict['no match'])
-            dfx = df[(df['Date'] >= d1) & (df['Date'] <= d2)].copy()
-            dfx = dfx[(dfx['creative.type'] == 'no match')]
-            groupons = ['Advertiser', 'placement','site','creative.type']
-            dfx = dfx.groupby(groupons, as_index=False)[x].sum()
-            dfx['mis_match'] = dfx['DFP Creative ID Clicks'] / dfx['DFP Creative ID Impressions']
-            dfx = dfx[dfx['mis_match']==0]
-            if len(dfx)<1:
-                print('no '+creative_type+' mismatches') 
-            dfx['mis_match'] = dfx['mis_match'].replace(0,'no_clicks')
-            dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
-            x=list(x)
-            x.pop(-1)
-            dfx = dfx.drop(x, axis=1)
-            storage.append(dfx)
-        elif creative_type == 'video':
-            x = tuple(metric_dict[creative_type])
-            dfx = df[(df['Date'] >= d1) & (df['Date'] <= d2)].copy()
-            dfx = dfx[(dfx['creative.type'] == creative_type)]
-            dfx = dfx.groupby(groupons, as_index=False)[x].sum()
-            dfx['mis_match'] = dfx['result_5'] / dfx['DFP Creative ID Impressions']
-            dfx = dfx[dfx['mis_match'].isnull()]
-            if len(dfx)<1:
-                print('no '+creative_type+' mismatches')
-            dfx['mis_match'] = dfx['mis_match'].fillna('no_kpi_actions')            
-            dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
-            x=list(x)
-            x.pop(-1)
-            dfx = dfx.drop(x, axis=1)
-            storage.append(dfx)
-        elif creative_type == 'interactive video':
-            x = tuple(metric_dict[creative_type])
-            dfx = df[(df['Date'] >= d1) & (df['Date'] <= d2)].copy()
-            dfx = dfx[(dfx['creative.type'] == creative_type)]
-            dfx = dfx.groupby(groupons, as_index=False)[x].sum()
-            dfx['mis_match'] = dfx['result_5'] / dfx['DFP Creative ID Impressions']
-            dfx = dfx[dfx['mis_match'].isnull()]
-            if len(dfx)<1:
-                print('no '+creative_type+' mismatches')
-            dfx['mis_match'] = dfx['mis_match'].fillna('no_kpi_actions')
-            dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
-            x=list(x)
-            x.pop(-1)
-            dfx = dfx.drop(x, axis=1)
-            storage.append(dfx)
-        elif 'driver' or 'autoplay' in creative_type:
-            x = tuple(metric_dict[creative_type])
-            dfx = df[(df['Date'] >= d1) & (df['Date'] <= d2)].copy()
-            dfx = dfx[(dfx['creative.type'] == creative_type)]
-            dfx = dfx.groupby(groupons, as_index=False)[x].sum()
-            dfx['mis_match'] = dfx['DFP Creative ID Clicks'] / dfx['DFP Creative ID Impressions']
-            dfx = dfx[dfx['mis_match']==0]
-            if len(dfx)<1:
-                print('no '+creative_type+' mismatches') 
-            dfx['mis_match'] = dfx['mis_match'].replace(0,'no_kpi_actions')
-            dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
-            x=list(x)
-            x.pop(-1)
-            dfx = dfx.drop(x, axis=1)
-            storage.append(dfx)
-    df_all = pd.concat(storage)
-    df_all=df_all.sort_values('DFP Creative ID Impressions',ascending=False)
-    col_order=['Advertiser', 'site','creative.name.version','placement', 
-       'creative.type', 'DFP Creative ID Impressions', 'mis_match']
-    df_all=df_all[col_order]
-    df_all=df_all[df_all['DFP Creative ID Impressions']>50]
-    return df_all
-=======
-    
+
 def ctr_checker():
     """
     Finds all campaigns without any CTR
     
     """
->>>>>>> parent of 7f43141... Merge pull request #2 from joebuckley06/mis_matched
     
     
 def benchmark_compare():
