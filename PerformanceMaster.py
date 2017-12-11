@@ -17,6 +17,7 @@ creative_type_metrics = {
 
 creative_types = {
     'branded driver',
+    'brand survey',
     'co-branded driver',
     'interactive non video',
     'interactive video',
