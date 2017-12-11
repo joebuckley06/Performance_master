@@ -1,8 +1,67 @@
 import os
 import pickle
+import collections
 import numpy as np
 import pandas as pd
 
+#################### variables for function use ################################
+sites = ('qz', 'wrk', 'zty')
+
+creative_type_metrics = {
+    'branded driver': ('DFP CTR', '3P CTR'),
+    'traffic driver': ('DFP CTR', '3P CTR'),
+    'video': ('DFP CTR','3P CTR', 'VSR'),
+    'interactive non video': ('DFP CTR', '3P CTR','IR'),
+    'interactive video': ('DFP CTR', '3P CTR','IR', 'VSR'),
+}
+
+creative_types = {
+    'branded driver',
+    'co-branded driver',
+    'interactive non video',
+    'interactive video',
+    'no match',
+    'traffic driver',
+    'video',
+    'video autoplay'
+}
+
+metric_dict = {
+    'DFP': {
+        'branded driver':
+            [('DFP CTR'),
+             ('DFP Creative ID Clicks', 'DFP Creative ID Impressions')],
+        'traffic driver':
+            [('DFP CTR'),
+             ('DFP Creative ID Clicks', 'DFP Creative ID Impressions')],
+        'video':
+            [('DFP CTR', 'VSR'),
+             ('DFP Creative ID Clicks', 'DFP Creative ID Impressions', 'result_5')],
+        'interactive non video':
+            [('DFP CTR','IR'),
+             ('DFP Creative ID Clicks', 'DFP Creative ID Impressions', 'int sessions')],
+        'interactive video':
+            [('DFP CTR', 'IR', 'VSR'),
+             ('DFP Creative ID Clicks', 'DFP Creative ID Impressions', 'int sessions','result_5')]
+    },
+    '3P': {
+        'branded driver':
+            [('3P CTR'), ('Normalized 3P Clicks', 'Normalized 3P Impressions')],
+        'traffic driver':
+            [('3P CTR'), ('Normalized 3P Clicks', 'Normalized 3P Impressions')],
+        'video':
+            [('3P CTR', '3P VSR'),
+             ('Normalized 3P Clicks', 'Normalized 3P Impressions', 'result_5')],
+        'interactive non video':
+            [('3P CTR','3P IR'),
+             ('Normalized 3P Clicks', 'Normalized 3P Impressions', 'int sessions')],
+        'interactive video':
+            [('3P CTR', '3P IR', '3P VSR'),
+             ('Normalized 3P Clicks', 'Normalized 3P Impressions', 'int sessions', 'result_5')]
+    }
+}
+
+############################# functions below ##################################
 def metric_calcs(df, metric='DFP CTR'):
     if metric == 'DFP CTR':
         x = (df['DFP Creative ID Clicks'] / df['DFP Creative ID Impressions']) * 100
@@ -141,7 +200,7 @@ def no_match_sorting(df, d1, d2, imp_thresh=1000):
 
     no_match = collections.namedtuple(
         'no_match', (
-            'Advertiser', 'Order', 'site', 'Line item', 'status', 'impressions'
+            'Advertiser', 'Order', 'site', 'Line_item', 'status', 'impressions'
         )
     )
 
@@ -172,40 +231,35 @@ def no_match_sorting(df, d1, d2, imp_thresh=1000):
     no_match = pd.DataFrame(s1)
     return no_match
 
-
-    
 def mismatched_checker():
     """
     Finds all campaigns where creative.type is pulling in an incorrect type
-    
+
     ex: VSR = NaN or IR = NaN
-    
-    
-    """    
-    
+
+
+    """
+
 def ctr_checker():
     """
     Finds all campaigns without any CTR
-    
+
     """
-    
-    
+
 def benchmark_compare():
     """
     Flags all placements that are underperforming relative to their main KPIs
 
 
-    """    
-    
-    
+    """
+
 def viewability_checker():
     """
     Flags all placements that are below the normal range for viewability
-        
+
     adding back in for test
-    
-    
+
+
     writing the next test step
     """
-    
-    
+
