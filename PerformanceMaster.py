@@ -205,6 +205,8 @@ def mismatched_checker(df, d1,d2):
             ['DFP Creative ID Clicks', 'result_5', 'DFP Creative ID Impressions'],
         'interactive non video': 
             ['DFP Creative ID Clicks', 'int sessions','DFP Creative ID Impressions'],
+        'brand survey': 
+            ['DFP Creative ID Clicks', 'int sessions','DFP Creative ID Impressions'],
         'interactive video': 
             ['DFP Creative ID Clicks', 'int sessions','result_5','DFP Creative ID Impressions'],
         'no match': 
