@@ -191,7 +191,6 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
 
     """
     storage=[]
-    groupons = ['Advertiser', 'placement', 'creative.name.version', 'site', 'creative.type']
 
     metric_dict= {
         'branded driver':
@@ -209,7 +208,7 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
         'brand survey':
             ['int sessions','DFP Creative ID Impressions'],
         'interactive video':
-            ['int sessions','result_5','DFP Creative ID Impressions'],
+            ['result_5','DFP Creative ID Impressions'],
         'no match':
             ['DFP Creative ID Clicks', 'DFP Creative ID Impressions']
     }
@@ -219,7 +218,8 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
 
 
     for creative_type in set(df['creative.type']):
-        if creative_type == 'interactive non video':
+        groupons = ['Advertiser', 'placement', 'creative.name.version', 'site', 'creative.type']
+        if creative_type == 'interactive non video' or 'survey' in creative_type:
 
             metrics = metric_dict[creative_type]
 
@@ -245,10 +245,12 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
             dfx = df[(df['creative.type'] == creative_type)].copy()
             dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
             dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
+            dfx['creative.name.version'] = 'no match'
             dfx = dfx[dfx['DFP Creative ID Clicks']==0].copy()
             
             if dfx.empty:
                print('no '+creative_type+' mismatches')
+            
             
             dfx['mis_match'] = 'no_clicks'
             dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
@@ -256,7 +258,7 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
             storage.append(dfx)
 
 
-        elif 'driver' or 'autoplay' in creative_type:
+        elif 'driver' in creative_type or 'autoplay' in creative_type:
             metrics = metric_dict[creative_type]
 
             dfx = df[(df['creative.type'] == creative_type)]
