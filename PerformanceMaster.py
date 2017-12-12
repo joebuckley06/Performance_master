@@ -232,12 +232,6 @@ def no_match_sorting(df, d1, d2, imp_thresh=1000):
     no_match = pd.DataFrame(s1)
     return no_match
 
-def mismatched_checker():
-    """
-    Finds all campaigns where creative.type is pulling in an incorrect type
-
-    ex: VSR = NaN or IR = NaN
-
 
 def mismatched_checker(df, d1, d2, imp_thresh=1000):
     """
