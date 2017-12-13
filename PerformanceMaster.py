@@ -361,12 +361,6 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
     return df_all
 
 
-def ctr_checker():
-    """
-    Finds all campaigns without any CTR
-
-    """
-
 def benchmark_compare():
     """
     Flags all placements that are underperforming relative to their main KPIs
