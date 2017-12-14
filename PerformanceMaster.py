@@ -361,11 +361,11 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
     return df_all
 
 
-def benchmark_compare(df, benchmarks, d1, d2, imp_thresh=1000,site='qz'):
+def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
     """
     Flags all placements that are underperforming relative to their main KPIs
     df = campaign DatafFrame
-    benchmarks = benchmarks DataFrame
+    benchmarks = benchmarks DataFrame file ('2017_display_benchmarks_CS.xlsx')
     d1 = start date
     d2 = end date
     imp_thresh = number of impressions to include in checker
@@ -373,113 +373,120 @@ def benchmark_compare(df, benchmarks, d1, d2, imp_thresh=1000,site='qz'):
 
     """
     
-creative_types = {
-    'branded driver',
-    'brand survey',
-    'co-branded driver',
-    'interactive non video',
-    'interactive video',
-    'no match',
-    'traffic driver',
-    'video',
-    'video autoplay'
-}
-
-metric_dict= {
-        'branded driver':
-            ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
-        'traffic driver':
-            ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
-        'video autoplay':
-            ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
-        'co-branded driver':
-            ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
-        'video':
-            ['DFP Creative ID Clicks','result_5', 'DFP Creative ID Impressions'],
-        'interactive non video':
-            ['DFP Creative ID Clicks','int sessions','DFP Creative ID Impressions'],
-        'brand survey':
-            ['DFP Creative ID Clicks','int sessions','DFP Creative ID Impressions'],
-        'interactive video':
-            ['DFP Creative ID Clicks','result_5','DFP Creative ID Impressions'],
-        'no match':
-            ['DFP Creative ID Clicks', 'DFP Creative ID Impressions']
-    }
-
-
-dfq = df[(df['Date'] >= d1) & (df['Date'] <= d2)]
-dfq = dfq[(dfq['site'] == site)]
-storage=[]
-
-
-for creative_type in creative_types:
-    if creative_type == 'interactive non video' or 'survey' in creative_type:
-        groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
-        metrics = metric_dict[creative_type]
-        dfx = dfq[(dfq['creative.type'] == creative_type)]
-        dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
-        dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
-        dfx['KPI_Rate'] = (dfx['int sessions'] + dfx['DFP Creative ID Clicks']) / dfx['DFP Creative ID Impressions']
-        dfx['KPI'] = 'IR'
-        dft = pd.merge(dfx,benchmarks,how='left',on=['placement','KPI'])
-        dft['Below_Bench'] = dft['KPI_Rate'] - dft['Benchmark']
-        dft = dft.sort_values('DFP Creative ID Impressions', ascending=False)
-        del dft['int sessions']
-        del dft['DFP Creative ID Clicks']
-        storage.append(dft)
-        
-    elif 'no match' in creative_type:
-        groupons = ['Advertiser', 'placement','site','creative.type']
-        metrics = metric_dict[creative_type]
-        dfx = dfq[(dfq['creative.type'] == creative_type)]
-        dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
-        dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
-        dfx['KPI_Rate'] = dfx['DFP Creative ID Clicks'] / dfx['DFP Creative ID Impressions']
-        dfx['KPI'] = 'CTR'
-        dft = pd.merge(dfx,benchmarks,how='left',on=['placement','KPI'])
-        dft['Below_Bench'] = dft['KPI_Rate'] - dft['Benchmark']
-        dft = dft.sort_values('DFP Creative ID Impressions', ascending=False)
-        dft['creative.name.version'] = 'no match'
-        del dft['DFP Creative ID Clicks']
-        storage.append(dft)
+    benchmarks = df_benchmarks[df_benchmarks['Data Source']=='DFP'].copy()
+    benchmarks['placement'] = benchmarks['Placement'].str.lower()
+    benchmarks = benchmarks.drop('Placement',1)
+    benchmarks = benchmarks.drop('Data Source',1)
+    benchmarks = benchmarks.rename(columns={'1H2017 BM':'Benchmark'})
     
-    elif 'driver'in creative_type or 'autoplay' in creative_type:
-        groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
-        metrics = metric_dict[creative_type]
-        dfx = dfq[(dfq['creative.type'] == creative_type)]
-        dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
-        dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
-        dfx['KPI_Rate'] = dfx['DFP Creative ID Clicks'] / dfx['DFP Creative ID Impressions']
-        dfx['KPI'] = 'CTR'
-        dft = pd.merge(dfx,benchmarks,how='left',on=['placement','KPI'])
-        dft['Below_Bench'] = dft['KPI_Rate'] - dft['Benchmark']
-        dft = dft.sort_values('DFP Creative ID Impressions', ascending=False)
-        del dft['DFP Creative ID Clicks']
-        storage.append(dft)
+    creative_types = {
+        'branded driver',
+        'brand survey',
+        'co-branded driver',
+        'interactive non video',
+        'interactive video',
+        'no match',
+        'traffic driver',
+        'video',
+        'video autoplay'
+    }
+    
+    metric_dict= {
+            'branded driver':
+                ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
+            'traffic driver':
+                ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
+            'video autoplay':
+                ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
+            'co-branded driver':
+                ['DFP Creative ID Clicks', 'DFP Creative ID Impressions'],
+            'video':
+                ['DFP Creative ID Clicks','result_5', 'DFP Creative ID Impressions'],
+            'interactive non video':
+                ['DFP Creative ID Clicks','int sessions','DFP Creative ID Impressions'],
+            'brand survey':
+                ['DFP Creative ID Clicks','int sessions','DFP Creative ID Impressions'],
+            'interactive video':
+                ['DFP Creative ID Clicks','result_5','DFP Creative ID Impressions'],
+            'no match':
+                ['DFP Creative ID Clicks', 'DFP Creative ID Impressions']
+        }
+    
+    
+    dfq = df[(df['Date'] >= d1) & (df['Date'] <= d2)]
+    dfq = dfq[(dfq['site'] == site)]
+    storage=[]
+    
+    
+    for creative_type in creative_types:
+        if creative_type == 'interactive non video' or 'survey' in creative_type:
+            groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
+            metrics = metric_dict[creative_type]
+            dfx = dfq[(dfq['creative.type'] == creative_type)]
+            dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
+            dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
+            dfx['KPI_Rate'] = (dfx['int sessions'] + dfx['DFP Creative ID Clicks']) / dfx['DFP Creative ID Impressions']
+            dfx['KPI'] = 'IR'
+            dft = pd.merge(dfx,benchmarks,how='left',on=['placement','KPI'])
+            dft['Below_Bench'] = dft['KPI_Rate'] - dft['Benchmark']
+            dft = dft.sort_values('DFP Creative ID Impressions', ascending=False)
+            del dft['int sessions']
+            del dft['DFP Creative ID Clicks']
+            storage.append(dft)
+            
+        elif 'no match' in creative_type:
+            groupons = ['Advertiser', 'placement','site','creative.type']
+            metrics = metric_dict[creative_type]
+            dfx = dfq[(dfq['creative.type'] == creative_type)]
+            dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
+            dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
+            dfx['KPI_Rate'] = dfx['DFP Creative ID Clicks'] / dfx['DFP Creative ID Impressions']
+            dfx['KPI'] = 'CTR'
+            dft = pd.merge(dfx,benchmarks,how='left',on=['placement','KPI'])
+            dft['Below_Bench'] = dft['KPI_Rate'] - dft['Benchmark']
+            dft = dft.sort_values('DFP Creative ID Impressions', ascending=False)
+            dft['creative.name.version'] = 'no match'
+            del dft['DFP Creative ID Clicks']
+            storage.append(dft)
         
-    elif 'video' in creative_type:
-        groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
-        metrics = metric_dict[creative_type]
-        dfx = dfq[(dfq['creative.type'] == creative_type)]
-        dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
-        dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
-        dfx['KPI_Rate'] = (dfx['result_5']) / dfx['DFP Creative ID Impressions']
-        dfx['KPI'] = 'VSR'
-        dft = pd.merge(dfx,benchmarks,how='left',on=['placement','KPI'])
-        dft['Below_Bench'] = dft['KPI_Rate'] - dft['Benchmark']
-        dft = dft.sort_values('DFP Creative ID Impressions', ascending=False)
-        del dft['result_5']
-        del dft['DFP Creative ID Clicks']
-        storage.append(dft)
-        
-from functools import reduce
-col_order=['Advertiser', 'site','creative.name.version','placement',
-'creative.type', 'DFP Creative ID Impressions','KPI_Rate','KPI',
-'Benchmark','Below_Bench']
-df_all = reduce(lambda left,right: pd.merge(left,right,on=col_order,how='outer'), storage)
-df_all = df_all.sort_values('DFP Creative ID Impressions',ascending=False)
-df_all = df_all[df_all['Below_Bench']<0]
-df_all=df_all[col_order]
+        elif 'driver'in creative_type or 'autoplay' in creative_type:
+            groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
+            metrics = metric_dict[creative_type]
+            dfx = dfq[(dfq['creative.type'] == creative_type)]
+            dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
+            dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
+            dfx['KPI_Rate'] = dfx['DFP Creative ID Clicks'] / dfx['DFP Creative ID Impressions']
+            dfx['KPI'] = 'CTR'
+            dft = pd.merge(dfx,benchmarks,how='left',on=['placement','KPI'])
+            dft['Below_Bench'] = dft['KPI_Rate'] - dft['Benchmark']
+            dft = dft.sort_values('DFP Creative ID Impressions', ascending=False)
+            del dft['DFP Creative ID Clicks']
+            storage.append(dft)
+            
+        elif 'video' in creative_type:
+            groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
+            metrics = metric_dict[creative_type]
+            dfx = dfq[(dfq['creative.type'] == creative_type)]
+            dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
+            dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
+            dfx['KPI_Rate'] = (dfx['result_5']) / dfx['DFP Creative ID Impressions']
+            dfx['KPI'] = 'VSR'
+            dft = pd.merge(dfx,benchmarks,how='left',on=['placement','KPI'])
+            dft['Below_Bench'] = dft['KPI_Rate'] - dft['Benchmark']
+            dft = dft.sort_values('DFP Creative ID Impressions', ascending=False)
+            del dft['result_5']
+            del dft['DFP Creative ID Clicks']
+            storage.append(dft)
+            
+    from functools import reduce
+    col_order=['Advertiser', 'site','creative.name.version','placement',
+    'creative.type', 'DFP Creative ID Impressions','KPI_Rate','KPI',
+    'Benchmark','Below_Bench']
+    df_all = reduce(lambda left,right: pd.merge(left,right,on=col_order,how='outer'), storage)
+    df_all = df_all.sort_values('DFP Creative ID Impressions',ascending=False)
+    df_all = df_all[df_all['Below_Bench']<0]
+    df_all=df_all[col_order]
+    return(df_all)
 
 def viewability_checker():
     """
