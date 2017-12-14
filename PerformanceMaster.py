@@ -365,7 +365,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
     """
     Flags all placements that are underperforming relative to their main KPIs
     df = campaign DatafFrame
-    benchmarks = benchmarks DataFrame file ('2017_display_benchmarks_CS.xlsx')
+    df_benchmarks = benchmarks DataFrame file ('2017_display_benchmarks_CS.xlsx')
     d1 = start date
     d2 = end date
     imp_thresh = number of impressions to include in checker
