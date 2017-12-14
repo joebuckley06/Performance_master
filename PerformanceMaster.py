@@ -470,7 +470,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
             dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
             dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
             dfx['KPI_Rate'] = (dfx['result_5']) / dfx['DFP Creative ID Impressions']
-            dfx['KPI'] = 'VSR'
+            dfx['KPI'] = 'VID'
             dft = pd.merge(dfx,benchmarks,how='left',on=['placement','KPI'])
             dft['Below_Bench'] = dft['KPI_Rate'] - dft['Benchmark']
             dft = dft.sort_values('DFP Creative ID Impressions', ascending=False)
