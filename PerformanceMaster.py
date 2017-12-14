@@ -418,7 +418,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
     storage=[]
     
     
-    for creative_type in creative_types:
+    for creative_type in set(df['creative.type']):
         if creative_type == 'interactive non video' or 'survey' in creative_type:
             groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
             metrics = metric_dict[creative_type]
