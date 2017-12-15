@@ -368,13 +368,36 @@ def benchmark_compare():
 
     """
 
-def viewability_checker():
+def viewability_checker(df, df_viewability, d1, d2, imp_thresh=1000,site='qz'):
     """
     Flags all placements that are below the normal range for viewability
 
-    adding back in for test
+    df : dataset
+    df_viewability : viewability benchmarks
+    d1 : initial date
+    d2 : end date
+    imp_thresh : only include ads with impressions greater than this number
+    site : 'qz' only qz for now
 
-
-    writing the next test step
+    Returns DF with ad placements where viewability is below QZ average
     """
-
+    dfq = df[(df['Date'] >= d1) & (df['Date'] <= d2)]
+    dfq = dfq[(dfq['site'] == site)]    
+    
+    groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
+    dfx = dfq.groupby(groupons, as_index=False)['DFP Creative ID Impressions','Ad server Active View viewable impressions'].sum()
+    dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
+    dfx['Ad_Viewable'] = (dfx['Ad server Active View viewable impressions']) / dfx['DFP Creative ID Impressions']
+    
+    dft = pd.merge(dfx,df_viewability,how='left',on=['placement'])
+    dft['Below_View'] = dft['Ad_Viewable'] - dft['QZ_Viewability']
+    dft = dft.sort_values('Below_View', ascending=True)
+    del dft['Ad server Active View viewable impressions']
+          
+    
+    col_order=['Advertiser', 'site','creative.name.version','placement',
+               'creative.type', 'DFP Creative ID Impressions','Ad_Viewable','QZ_Viewability','Below_View']
+    
+    dft = dft[dft['Below_View']<0]
+    dft=dft[col_order]
+    return dft
