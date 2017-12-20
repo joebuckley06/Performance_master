@@ -246,7 +246,7 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
     d2 = end date
 
     Outputs:
-    DataFrame with all "mis-matches" with impressions greater than imp_thresh 
+    DataFrame with all "mis-matches" with impressions greater than imp_thresh
 
     """
     storage=[]
@@ -306,11 +306,11 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
             dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
             dfx['creative.name.version'] = 'no match'
             dfx = dfx[dfx['DFP Creative ID Clicks']==0].copy()
-            
+
             if dfx.empty:
                print('no '+creative_type+' mismatches')
-            
-            
+
+
             dfx['mis_match'] = 'no_clicks'
             dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
             del dfx['DFP Creative ID Clicks']
@@ -324,15 +324,15 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
             dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
             dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
             dfx = dfx[dfx['DFP Creative ID Clicks']==0].copy()
-            
+
             if dfx.empty:
                print('no '+creative_type+' mismatches')
-            
+
             dfx['mis_match'] = 'no_kpi_actions'
             dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
             del dfx['DFP Creative ID Clicks']
             storage.append(dfx)
-        
+
         elif 'video' in creative_type:
             metrics = metric_dict[creative_type]
 
@@ -340,17 +340,17 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
             dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
             dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
             dfx = dfx[dfx['result_5'].isnull()].copy()
-            
+
             if dfx.empty:
                print('no '+creative_type+' mismatches')
-            
+
             dfx['mis_match'] = 'no_kpi_actions'
             dfx = dfx.sort_values('DFP Creative ID Impressions', ascending=False)
             del dfx['result_5']
             storage.append(dfx)
 
 
-        
+
 
 
     df_all = pd.concat(storage)
@@ -360,7 +360,7 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
     df_all=df_all[col_order]
     return df_all
 
-
+  
 def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
     """
     Flags all placements that are underperforming relative to their main KPIs
@@ -413,8 +413,9 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
         }
     
     
-    dfq = df[(df['Date'] >= d1) & (df['Date'] <= d2)]
-    dfq = dfq[(dfq['site'] == site)]
+    df = df[(df['Date'] >= d1) &
+            (df['Date'] <= d2) &
+            (df['site'] == site)]
     storage=[]
     
     
@@ -422,7 +423,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
         if creative_type == 'interactive non video' or 'survey' in creative_type:
             groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
             metrics = metric_dict[creative_type]
-            dfx = dfq[(dfq['creative.type'] == creative_type)]
+            dfx = df[(df['creative.type'] == creative_type)]
             dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
             dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
             dfx['KPI_Rate'] = (dfx['int sessions'] + dfx['DFP Creative ID Clicks']) / dfx['DFP Creative ID Impressions']
@@ -437,7 +438,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
         elif 'no match' in creative_type:
             groupons = ['Advertiser', 'placement','site','creative.type']
             metrics = metric_dict[creative_type]
-            dfx = dfq[(dfq['creative.type'] == creative_type)]
+            dfx = df[(df['creative.type'] == creative_type)]
             dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
             dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
             dfx['KPI_Rate'] = dfx['DFP Creative ID Clicks'] / dfx['DFP Creative ID Impressions']
@@ -452,7 +453,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
         elif 'driver'in creative_type or 'autoplay' in creative_type:
             groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
             metrics = metric_dict[creative_type]
-            dfx = dfq[(dfq['creative.type'] == creative_type)]
+            dfx = df[(df['creative.type'] == creative_type)]
             dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
             dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
             dfx['KPI_Rate'] = dfx['DFP Creative ID Clicks'] / dfx['DFP Creative ID Impressions']
@@ -466,7 +467,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
         elif 'video' in creative_type:
             groupons = ['Advertiser', 'placement','creative.name.version','site','creative.type']
             metrics = metric_dict[creative_type]
-            dfx = dfq[(dfq['creative.type'] == creative_type)]
+            dfx = df[(df['creative.type'] == creative_type)]
             dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
             dfx = dfx[dfx['DFP Creative ID Impressions'] >= imp_thresh]
             dfx['KPI_Rate'] = (dfx['result_5']) / dfx['DFP Creative ID Impressions']
@@ -488,13 +489,44 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
     df_all=df_all[col_order]
     return(df_all)
 
-def viewability_checker():
+def viewability_checker(df, df_viewability, d1, d2, imp_thresh=1000, site='qz'):
     """
     Flags all placements that are below the normal range for viewability
 
-    adding back in for test
+    df : dataset
+    df_viewability : viewability benchmarks
+    d1 : initial date
+    d2 : end date
+    imp_thresh : only include ads with impressions greater than this number
+    site : 'qz' only qz for now
 
-
-    writing the next test step
+    Returns DF with ad placements where viewability is below QZ average
     """
+    groupons = ['Advertiser', 'site', 'placement', 'creative.name.version',
+                'creative.type']
 
+    return_cols =['DFP Creative ID Impressions', 'Ad_viewable', 'QZ_Viewability',
+                  'Below_view']
+
+    col_order = groupons + return_cols
+
+    V_num = 'Ad server Active View viewable impressions'    #numerator
+    V_den = 'DFP Creative ID Impressions'                   #denominator
+
+    df = df[(df['Date'] >= d1) &
+            (df['Date'] <= d2) &
+            (df['site'] == site)]
+
+    df = df.groupby(groupons, as_index=False)[V_num, V_den].sum()
+    df = df[df[V_den] >= imp_thresh]
+    df['Ad_viewable'] = df[V_num] / df[V_den]
+
+    df = pd.merge(df, df_viewability, how='left', on='placement')
+    df['Below_view'] = df['Ad_viewable'] - df['QZ_Viewability']
+    df = df.sort_values('Below_view', ascending=True)
+
+    del df[V_num]
+    df = df[df['Below_view']<0]
+    df = df[col_order]
+
+    return df
