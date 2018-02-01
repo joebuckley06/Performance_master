@@ -205,22 +205,24 @@ def no_match_sorting(df, d1, d2, imp_thresh=1000):
         )
     )
 
-    DF = df[(df['date'] >= d1) & (df['date'] <= d2)]
+    # import pdb; pdb.set_trace()
+    DF = df[(df['date'] >= d1) & (df['date'] <= d2) & (df['creative_type'] == 'no_match')]
 
     s1 = []
     for order in set(DF['order']):
-        dfx = DF[
-            (DF['order'] == order) &
-            (DF['creative_type'] == 'no_match')]
+        dfx = DF[DF['order'] == order]
 
-        dfx = dfx.groupby(('advertiser', 'site', 'Line item'), as_index=False).sum()
+
+        dfx = dfx.groupby(('advertiser', 'site', 'line_item'), as_index=False).sum()
+        # if not dfx.empty:
+
         dfx = dfx[dfx['dfp_impressions'] > imp_thresh]
 
         if not dfx.empty:
             for i, row in dfx.iterrows():
                 advert = row['advertiser']
                 site = row['site']
-                line_item = row['Line item']
+                line_item = row['line_item']
                 status = 'no_match'
                 impressions = row['dfp_impressions']
                 s1.append(
