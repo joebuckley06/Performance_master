@@ -278,7 +278,7 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
 
 
     for creative_type in set(df['creative_type']):
-        groupons = ['advertiser', 'placement', 'creative.name.version', 'site', 'creative_type']
+        groupons = ['advertiser', 'placement', 'creative_name_version', 'site', 'creative_type']
         if creative_type == 'interactive non video' or 'survey' in creative_type:
 
             metrics = metric_dict[creative_type]
@@ -305,7 +305,7 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
             dfx = df[(df['creative_type'] == creative_type)].copy()
             dfx = dfx.groupby(groupons, as_index=False)[metrics].sum()
             dfx = dfx[dfx['dfp_impressions'] >= imp_thresh]
-            dfx['creative.name.version'] = 'no_match'
+            dfx['creative_name_version'] = 'no_match'
             dfx = dfx[dfx['dfp_clicks']==0].copy()
 
             if dfx.empty:
@@ -356,7 +356,7 @@ def mismatched_checker(df, d1, d2, imp_thresh=1000):
 
     df_all = pd.concat(storage)
     df_all=df_all.sort_values('dfp_impressions',ascending=False)
-    col_order=['advertiser', 'site','creative.name.version','placement',
+    col_order=['advertiser', 'site','creative_name_version','placement',
        'creative_type', 'dfp_impressions', 'mis_match']
     df_all=df_all[col_order]
     return df_all
@@ -406,7 +406,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
 
     storage=[]
 
-    groupons = ['advertiser', 'placement', 'creative.name.version', 'site',
+    groupons = ['advertiser', 'placement', 'creative_name_version', 'site',
         'creative_type']
 
     def merger(df, df_bm):
@@ -452,7 +452,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
 
             dft = merger(dfx, df_bm)
 
-            dft['creative.name.version'] = 'no_match'
+            dft['creative_name_version'] = 'no_match'
             del dft['dfp_clicks']
             storage.append(dft)
 
@@ -488,7 +488,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
     # from functools import reduce
     # df_all = reduce(lambda left,right: pd.merge(left,right,on=col_order,how='outer'), storage)
 
-    col_order=['advertiser', 'site','creative.name.version','placement',
+    col_order=['advertiser', 'site','creative_name_version','placement',
     'creative_type', 'dfp_impressions','KPI_Rate','KPI',
     'Benchmark','Below_Bench']
 
@@ -526,7 +526,7 @@ def viewability_checker(df, df_viewability, d1, d2, imp_thresh=1000, site='qz'):
 
     Returns DF with ad placements where viewability is below QZ average
     """
-    groupons = ['advertiser', 'site', 'placement', 'creative.name.version',
+    groupons = ['advertiser', 'site', 'placement', 'creative_name_version',
                 'creative_type']
 
     return_cols =['dfp_impressions', 'Ad_viewable', 'QZ_Viewability',
