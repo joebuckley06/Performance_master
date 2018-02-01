@@ -496,8 +496,18 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
 
     # add in summary
     # the number of placements ABOVE benchmarck & below benchmark
-    print(df_all[df_all['Below_Bench']>=0].shape)
-    print(df_all[df_all['Below_Bench']<0].shape)
+    above_bench = len(df_all[df_all['Below_Bench']>=0])
+    below_bench = len(df_all[df_all['Below_Bench']<0])
+    percent_above = above_bench / (above_bench + below_bench)
+
+    print(above_bench, 'creative placements ABOVE benchmark')
+    print(below_bench, 'creative placements BELOW benchmark')
+    print(int(percent_above*100), 'percent of creative placements ABOVE')
+
+    ab_imp = df_all[df_all['Below_Bench']>=0]['DFP Creative ID Impressions'].sum()
+    bb_imp = df_all[df_all['Below_Bench']<0]['DFP Creative ID Impressions'].sum()
+    imp_report = ab_imp / (bb_imp + ab_imp)
+    print(int(imp_report*100), 'percent of impressions ABOVE')
 
     return df_all[df_all['Below_Bench']<0]
 
