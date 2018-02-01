@@ -511,7 +511,7 @@ def benchmark_compare(df, df_benchmarks, d1, d2, imp_thresh=1000,site='qz'):
     imp_report = ab_imp / (bb_imp + ab_imp)
     print(int(imp_report*100), 'percent of impressions ABOVE')
 
-    return df_all[df_all['Below_Bench']<0]
+    return df_all
 
 def viewability_checker(df, df_viewability, d1, d2, imp_thresh=1000, site='qz'):
     """
